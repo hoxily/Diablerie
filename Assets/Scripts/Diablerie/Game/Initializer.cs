@@ -11,20 +11,21 @@ namespace Diablerie.Game
 {
     public class Initializer : MonoBehaviour
     {
+        public static readonly string MpqDir = @"Z:\appstore\diablo2\mpq2zip\";
         public MainMenu mainMenuPrefab;
         private DataLoader.LoadProgress loadProgress;
         private static DataLoader.Paths paths = new DataLoader.Paths
         {
             mpq = new []
             {
-                new DataLoader.MpqLocation{filename="d2exp.mpq", optional=false}, 
-                new DataLoader.MpqLocation{filename="d2data.mpq", optional=false}, 
-                new DataLoader.MpqLocation{filename="d2char.mpq", optional=false}, 
-                new DataLoader.MpqLocation{filename="d2sfx.mpq", optional=true}, 
-                new DataLoader.MpqLocation{filename="d2music.mpq", optional=true}, 
-                new DataLoader.MpqLocation{filename="d2xMusic.mpq", optional=true}, 
-                new DataLoader.MpqLocation{filename="d2xtalk.mpq", optional=true}, 
-                new DataLoader.MpqLocation{filename="d2speech.mpq", optional=true}, 
+                new DataLoader.MpqLocation{filename= MpqDir + "d2exp.zip", optional=false}, 
+                new DataLoader.MpqLocation{filename= MpqDir + "d2data.zip", optional=false}, 
+                new DataLoader.MpqLocation{filename= MpqDir + "d2char.zip", optional=false}, 
+                new DataLoader.MpqLocation{filename= MpqDir + "d2sfx.zip", optional=true}, 
+                new DataLoader.MpqLocation{filename= MpqDir + "d2music.zip", optional=true}, 
+                new DataLoader.MpqLocation{filename= MpqDir + "d2xMusic.zip", optional=true}, 
+                new DataLoader.MpqLocation{filename= MpqDir + "d2xtalk.zip", optional=true}, 
+                new DataLoader.MpqLocation{filename= MpqDir + "d2speech.zip", optional=true}, 
             },
             animData=@"data\global\animdata.d2",
         }; 

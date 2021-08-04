@@ -215,7 +215,7 @@ namespace Editor
 
             {
                 var sw = System.Diagnostics.Stopwatch.StartNew();
-                using (StormLib.MpqFileStream stream = Mpq.fs.OpenFile(filename))
+                using (var stream = Mpq.fs.OpenFile(filename))
                 {
                     Debug.Log("File size " + stream.Length + " bytes");
                     stream.ReadAllBytes();

@@ -10,7 +10,16 @@ namespace Diablerie.Engine.IO.D2Formats
         {
             try
             {
-                var archive = new MpqArchive(filename);
+                IMpqArchive archive = null;
+                if (filename.EndsWith(".zip", System.StringComparison.OrdinalIgnoreCase))
+                {
+                    archive = new ZipArchive(filename);
+                }
+                else
+                {
+                    archive = new MpqArchive(filename);
+                }
+                
                 fs.Archives.Add(archive);
             }
             catch (System.IO.FileNotFoundException)
@@ -46,8 +55,7 @@ namespace Diablerie.Engine.IO.D2Formats
             {
                 using (var stream = fs.OpenFile(filename))
                 {
-                    byte[] bytes = new byte[stream.Length];
-                    stream.Read(bytes, 0, bytes.Length);
+                    byte[] bytes = stream.ReadAllBytes();
                     string result;
                     fixed (byte* pointer = bytes)
                     {

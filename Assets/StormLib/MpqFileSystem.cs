@@ -6,9 +6,9 @@ namespace StormLib
 {
     public class MpqFileSystem : IDisposable
     {
-        private List<MpqArchive> archives = new List<MpqArchive>();
+        private List<IMpqArchive> archives = new List<IMpqArchive>();
 
-        public IList<MpqArchive> Archives
+        public IList<IMpqArchive> Archives
         {
             get
             {
@@ -26,7 +26,7 @@ namespace StormLib
             return false;
         }
         
-        public MpqFileStream OpenFile(string filename)
+        public MpqFileStreamBase OpenFile(string filename)
         {
             foreach (var archive in archives)
             {

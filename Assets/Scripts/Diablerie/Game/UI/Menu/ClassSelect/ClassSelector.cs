@@ -34,7 +34,7 @@ namespace Diablerie.Game.UI.Menu.ClassSelect
         private SpriteAnimator _mainAnimator;
         private SpriteAnimator _overlayAnimator;
         private AudioSource _audioSource;
-        private MpqFileStream _sfxStream;
+        private MpqFileStreamBase _sfxStream;
         private ClassSelectorState _state = ClassSelectorState.None;
         
         #endregion
