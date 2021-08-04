@@ -59,10 +59,15 @@ public class Wav
             var chunk = _chunks[_chunkIndex];
             int samplesAvailable = chunk.sampleCount + chunk.sampleOffset - _sampleIndex;
             int samplesToRead = Math.Min(data.Length - i, samplesAvailable);
+            // 这里的samplesToRead数量巨大，导致ReadSample调用次过多（约35280次），从而直接卡住。
+            /*
             for (int j = 0; j < samplesToRead; ++j, ++i)
             {
                 data[i] = ReadSample(_reader);
-            }
+            }*/
+            // 使用批量读取的方式，提高性能。
+            ReadSample(_reader, data, i, samplesToRead);
+            i += samplesToRead;
             _sampleIndex += samplesToRead;
             if (i < data.Length)
                 ++_chunkIndex;
@@ -128,6 +133,17 @@ public class Wav
         byte byte1 = reader.ReadByte();
         byte byte2 = reader.ReadByte();
         return BytesToFloat(byte1, byte2);
+    }
+
+    private static void ReadSample(BinaryReader reader, float[] sampleBuffer, int startIndex, int sampleCount)
+    {
+        byte[] buffer = new byte[sampleCount * 2];
+        reader.BaseStream.Read(buffer, 0, buffer.Length);
+        for (int i = 0; i < buffer.Length; i += 2)
+        {
+            short s = (short)((buffer[i + 1] << 8) | buffer[i]);
+            sampleBuffer[startIndex + i / 2] = s / 32768.0F;
+        }
     }
 
     private static float BytesToFloat(byte byte1, byte byte2)
