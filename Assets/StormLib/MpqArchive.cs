@@ -88,18 +88,21 @@ namespace StormLib
     class ZipArchiveReaderSettings
     {
         public bool debug = false;
+        public bool useListFile = true;
     }
 
     class ZipArchiveReader
     {
         FileStream zipFileStream;
         ZipArchiveReaderSettings settings;
+        string m_filePath;
 
         byte[] buffer;
         public ZipArchiveReader(string filePath)
         {
             settings = new ZipArchiveReaderSettings();
             zipFileStream = File.OpenRead(filePath);
+            m_filePath = filePath;
             buffer = new byte[8];
         }
 
@@ -159,7 +162,48 @@ namespace StormLib
             }
         }
 
-        public Dictionary<string, ZipLocalFileHeader> GetFileList()
+        Dictionary<string, ZipLocalFileHeader> GetFileListByListFile()
+        {
+            string listFilename = m_filePath + ".list";
+            if (!File.Exists(listFilename))
+            {
+                throw new FileNotFoundException(listFilename + " not found.", listFilename);
+            }
+
+            Dictionary<string, ZipLocalFileHeader> fileList = new Dictionary<string, ZipLocalFileHeader>();
+            using (StreamReader reader = new StreamReader(listFilename))
+            {
+                // skip first 2 lines
+                reader.ReadLine();
+                reader.ReadLine();
+                string line = null;
+                while ((line = reader.ReadLine()) != null)
+                {
+                    if (line.StartsWith("total file count:") ||
+                        line.StartsWith("End list for zip archive")
+                        )
+                    {
+                        break;
+                    }
+
+                    string[] splits = line.Split(',');
+                    if (splits.Length != 3)
+                    {
+                        continue;
+                    }
+
+                    ZipLocalFileHeader lfh = new ZipLocalFileHeader();
+                    string name = splits[0];
+                    lfh.fileDataOffset = long.Parse(splits[1]);
+                    lfh.compressedSize = uint.Parse(splits[2]);
+
+                    fileList.Add(name, lfh);
+                }
+            }
+            return fileList;
+        }
+
+        Dictionary<string, ZipLocalFileHeader> GetFileListByScanning()
         {
             Dictionary<string, ZipLocalFileHeader> fileList = new Dictionary<string, ZipLocalFileHeader>();
             uint signature;
@@ -206,6 +250,18 @@ namespace StormLib
             }
 
             return fileList;
+        }
+
+        public Dictionary<string, ZipLocalFileHeader> GetFileList()
+        {
+            if (settings.useListFile)
+            {
+                return GetFileListByListFile();
+            }
+            else
+            {
+                return GetFileListByScanning();
+            }
         }
     }
 
@@ -261,7 +317,7 @@ namespace StormLib
             
             var header = m_fileList[filename];
             long offset = header.fileDataOffset;
-            long length = m_fileList[filename].compressedSize;
+            long length = header.compressedSize;
             return new ZipFileStream(m_reader.GetStream(), offset, length);
         }
     }
