@@ -31,12 +31,20 @@ namespace Diablerie.Engine.World
         static readonly int corpseLocationIndex = DT1.Tile.Index(32, 0, 10);
         static readonly int portalLocationIndex = DT1.Tile.Index(33, 0, 10);
 
-        static DT1.Sampler specialTiles = new DT1.Sampler();
-        static LevelBuilder()
+        static DT1.Sampler _specialTiles;
+        static DT1.Sampler specialTiles
         {
-            var palette = Palette.GetPalette(PaletteType.Act1);
-            var dt1 = DT1.Load(Application.streamingAssetsPath + "/ds1edit.dt1", palette, mpq: false);
-            specialTiles.Add(dt1.tiles);
+            get
+            {
+                if (_specialTiles == null)
+                {
+                    _specialTiles = new DT1.Sampler();
+                    var palette = Palette.GetPalette(PaletteType.Act1);
+                    var dt1 = DT1.Load(Path.Combine(Game.Initializer.DataPath, "ds1edit.dt1"), palette, mpq: false);
+                    specialTiles.Add(dt1.tiles);
+                }
+                return _specialTiles;
+            }
         }
 
         public LevelBuilder(string name, int gridX = -1, int gridY = -1)

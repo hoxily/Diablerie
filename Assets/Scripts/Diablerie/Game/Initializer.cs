@@ -11,27 +11,61 @@ namespace Diablerie.Game
 {
     public class Initializer : MonoBehaviour
     {
-        public static readonly string MpqDir = @"Z:\appstore\diablo2\mpq2zip\";
+        public static string DataPath = null;
+
+        private string MpqDir
+        {
+            get
+            {
+#if UNITY_EDITOR
+                return @"Z:\appstore\diablo2\mpq2zip\";
+#else
+                return Application.persistentDataPath;
+#endif
+            }
+        }
+
         public MainMenu mainMenuPrefab;
         private DataLoader.LoadProgress loadProgress;
-        private static DataLoader.Paths paths = new DataLoader.Paths
+        private bool _pathsInited = false;
+        private DataLoader.Paths _paths;
+        private DataLoader.Paths paths
         {
-            mpq = new []
+            get
             {
-                new DataLoader.MpqLocation{filename= MpqDir + "d2exp.zip", optional=false}, 
-                new DataLoader.MpqLocation{filename= MpqDir + "d2data.zip", optional=false}, 
-                new DataLoader.MpqLocation{filename= MpqDir + "d2char.zip", optional=false}, 
-                new DataLoader.MpqLocation{filename= MpqDir + "d2sfx.zip", optional=true}, 
-                new DataLoader.MpqLocation{filename= MpqDir + "d2music.zip", optional=true}, 
-                new DataLoader.MpqLocation{filename= MpqDir + "d2xMusic.zip", optional=true}, 
-                new DataLoader.MpqLocation{filename= MpqDir + "d2xtalk.zip", optional=true}, 
-                new DataLoader.MpqLocation{filename= MpqDir + "d2speech.zip", optional=true}, 
-            },
-            animData=@"data\global\animdata.d2",
-        }; 
+                if (!_pathsInited)
+                {
+                    _paths = new DataLoader.Paths
+                    {
+                        mpq = new[]
+                        {
+                            new DataLoader.MpqLocation{filename= Path.Combine(MpqDir, "d2exp.zip"), optional=false},
+                            new DataLoader.MpqLocation{filename= Path.Combine(MpqDir, "d2data.zip"), optional=false},
+                            new DataLoader.MpqLocation{filename= Path.Combine(MpqDir, "d2char.zip"), optional=false},
+                            new DataLoader.MpqLocation{filename= Path.Combine(MpqDir, "d2sfx.zip"), optional=true},
+                            new DataLoader.MpqLocation{filename= Path.Combine(MpqDir, "d2music.zip"), optional=true},
+                            new DataLoader.MpqLocation{filename= Path.Combine(MpqDir, "d2xMusic.zip"), optional=true},
+                            new DataLoader.MpqLocation{filename= Path.Combine(MpqDir, "d2xtalk.zip"), optional=true},
+                            new DataLoader.MpqLocation{filename= Path.Combine(MpqDir, "d2speech.zip"), optional=true},
+                        },
+                        animData = @"data\global\animdata.d2",
+                    };
+                }
+                return _paths;
+            }
+        } 
         
         void Awake()
         {
+            Debug.LogFormat("Application.persistentPath: {0}", Application.persistentDataPath);
+            if (Application.isEditor)
+            {
+                DataPath = Application.streamingAssetsPath;
+            }
+            else
+            {
+                DataPath = Application.persistentDataPath;
+            }
             Materials.Initialize();
             AudioManager.Initialize();
             Datasheet.SetLocation(typeof(BodyLoc), "data/global/excel/bodylocs.txt");

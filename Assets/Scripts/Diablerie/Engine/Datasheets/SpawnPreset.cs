@@ -33,7 +33,7 @@ namespace Diablerie.Engine.Datasheets
 
         public static void Load()
         {
-            sheet = Datasheet.Load<SpawnPreset>("/obj.txt");
+            sheet = Datasheet.Load<SpawnPreset>("obj.txt");
             lookup = new Dictionary<long, SpawnPreset>();
             foreach (SpawnPreset obj in sheet)
             {

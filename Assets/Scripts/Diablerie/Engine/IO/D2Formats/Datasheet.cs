@@ -55,7 +55,9 @@ namespace Diablerie.Engine.IO.D2Formats
 
             Profiler.BeginSample("File.ReadAllText");
             var fileSw = Stopwatch.StartNew();
-            string csv = File.ReadAllText(Application.streamingAssetsPath + "/" + filename);
+            string dataPath = Game.Initializer.DataPath;
+            string csvPath = Path.Combine(dataPath, filename);
+            string csv = File.ReadAllText(csvPath);
             var fileReadMs = fileSw.ElapsedMilliseconds;
             Profiler.EndSample();
 
